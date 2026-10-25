@@ -1,0 +1,37 @@
+{
+  "name": "Quietly",
+  "identifier": "org.quietly.source",
+  "subtitle": "Keep your friends. Leave the endless feed.",
+  "description": "Free, MIT-licensed early releases of Quietly for SideStore and AltStore Classic.",
+  "website": "https://github.com/botondberdedev-cell/quietly",
+  "iconURL": "https://raw.githubusercontent.com/botondberdedev-cell/quietly/main/Quietly/Assets.xcassets/AppIcon.appiconset/AppIcon.png",
+  "tintColor": "214D3B",
+  "apps": [
+    {
+      "name": "Quietly",
+      "bundleIdentifier": "org.quietly.focus",
+      "developerName": "Botond Berde",
+      "subtitle": "Instagram, one intentional visit at a time.",
+      "localizedDescription": "Browse people you follow, Stories, messages and your own profile. Open shared videos individually, with the endless Reels and Explore feeds blocked. Free and open source. Early beta: layout changes can affect filtering. Message alerts work while open, not in the background. Requires Instagram sign-in and seven-day signing refreshes with a free Apple account.",
+      "iconURL": "https://raw.githubusercontent.com/botondberdedev-cell/quietly/main/Quietly/Assets.xcassets/AppIcon.appiconset/AppIcon.png",
+      "tintColor": "214D3B",
+      "category": "social",
+      "versions": [
+        {
+          "version": "0.2.0",
+          "buildVersion": "2",
+          "date": "2026-10-25",
+          "localizedDescription": "Own-profile and followed-profile videos remain accessible. Selected Reels open one at a time; the endless Reels feed stays blocked. Early testing release; Instagram layouts can change.",
+          "downloadURL": "https://github.com/botondberdedev-cell/quietly/releases/download/v0.2.0-beta.1/Quietly-0.2.0.ipa",
+          "size": 233414,
+          "minOSVersion": "17.0"
+        }
+      ],
+      "appPermissions": {
+        "entitlements": [],
+        "privacy": {}
+      }
+    }
+  ],
+  "news": []
+}
