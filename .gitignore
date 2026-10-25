@@ -1,0 +1,17 @@
+.DS_Store
+.build/
+build/
+DerivedData/
+node_modules/
+test-results/
+*.xcuserstate
+xcuserdata/
+.swiftpm/
+.env
+.env.*
+*.p12
+*.p8
+*.mobileprovision
+*.provisionprofile
+*.ipa
+__pycache__/

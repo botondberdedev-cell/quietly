@@ -1,0 +1,11 @@
+{
+  "name": "quietly-filter-tests",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Offline browser checks for the bundled iOS filter script; no npm dependencies ship in the app.",
+  "scripts": {
+    "test": "node --test Tests/filters.test.cjs",
+    "test:webkit": "TEST_BROWSER=webkit node --test Tests/filters.test.cjs"
+  },
+  "devDependencies": { "playwright": "1.58.2" }
+}

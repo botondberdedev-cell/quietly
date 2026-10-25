@@ -1,0 +1,19 @@
+name: Compatibility or bug report
+description: Report a problem without including private Instagram content.
+body:
+  - type: markdown
+    attributes:
+      value: Please omit passwords, tokens, cookies, private links, message text and other people's account details.
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps and result
+      description: What did you tap, what happened, and what did you expect? For a Reel, include whether it stayed inside Instagram or opened “One post, all yours”.
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: App version, iOS version and Instagram language
+    validations:
+      required: true

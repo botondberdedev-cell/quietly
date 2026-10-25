@@ -1,0 +1,30 @@
+name: Checks
+on: [push, pull_request]
+jobs:
+  filters:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install --with-deps chromium webkit
+      - run: pnpm test
+      - run: pnpm test:webkit
+  ios:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: swift test
+      - run: python3 scripts/generate_project.py
+      - run: git diff --exit-code -- Quietly.xcodeproj Quietly/Resources/LICENSE.txt
+      - run: python3 scripts/test_ios.py --result-bundle test-results/native.xcresult
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: native-test-results
+          path: test-results/
