@@ -90,7 +90,7 @@ struct SettingsView: View {
                 }
 
                 Section("About") {
-                    LabeledContent("Version", value: "0.1.0 · Prototype")
+                    LabeledContent("Version", value: versionLabel)
                     LabeledContent("License", value: "MIT · Open source")
                     Link("Source code on GitHub", destination: URL(string: "https://github.com/botondberdedev-cell/quietly")!)
                     Text("Quietly is an independent project, not affiliated with Instagram, Meta or SocialLite. Quietly is a working name.")
@@ -143,10 +143,16 @@ struct SettingsView: View {
                 Text("Instagram still receives your login, messages and browsing requests and handles them under its own terms and privacy policy. Quietly cannot remove Instagram’s own data collection. Website resources may contact Meta and other providers.")
                 Link("Instagram’s privacy policy", destination: URL(string: "https://privacycenter.instagram.com/policy/")!)
             }
-            Section("Prototype limitations") {
-                Text("Filters depend on Instagram’s page structure and may break when it changes. Ad hiding covers recognized sponsored feed cards; Story ads and unfamiliar layouts may still appear. This is a voluntary focus tool, not a parental lock. It has not yet been validated on a physical iPhone.")
+            Section("Beta limitations") {
+                Text("Filters depend on Instagram’s page structure and may break when it changes. Ad hiding covers recognized sponsored feed cards; Story ads and unfamiliar layouts may still appear. This is a voluntary focus tool, not a parental lock. Compatibility testing is ongoing; some accounts and layouts may behave differently.")
             }
         }.navigationTitle("Privacy & details")
+    }
+
+    private var versionLabel: String {
+        let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "Unknown"
+        let build = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "Unknown"
+        return "\(version) (\(build)) · Beta"
     }
 
     private var license: String {
