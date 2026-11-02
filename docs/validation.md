@@ -1,4 +1,14 @@
-# Validation — October 25, 2026
+# Validation — November 2, 2026
+
+## 0.2.0 (3) TestFlight upload — November 2, 2026
+
+- **112 automated tests passed:** 16 Swift core, 35 Chromium, 35 WebKit, 18 native app-host and 8 native UI tests. Native suites used the dedicated iPhone 17 / iOS 27.0 QA simulator with Xcode 27.2. Result bundle: `test-results/testflight-20261102.xcresult`.
+- Release archive succeeded with Swift warnings treated as errors. The About screen now displays the actual installed version/build and accurately describes the beta compatibility limits.
+- App Store Connect app **Quietly: Friends & Focus** was registered with bundle ID `com.botondberde.quietly`. The short on-device display name remains Quietly.
+- App Store export succeeded using the paid developer team. Strict signature verification passed with an Apple Distribution certificate, a Store provisioning profile, `get-task-allow=false` and `beta-reports-active=true`. No device list is embedded. The bundled scripts, license and privacy manifest were verified.
+- Xcode confirmed **upload succeeded** and Apple began processing version **0.2.0 (3)**. Upload logs and distribution artifacts remain under ignored `build/testflight/`. An accepted upload is not beta-review or public App Store approval.
+- [Privacy](privacy.md) and [support](support.md) documents now include publisher contact details, Instagram data handling and TestFlight diagnostic disclosures.
+- External beta review still needs a dedicated Instagram review account entered privately in App Store Connect. Never commit review credentials or share personal account sessions. Broader physical-device, account/layout and service-authorization limitations below remain applicable.
 
 ## 0.2.0 sideloading beta
 
@@ -43,6 +53,6 @@ Temporary account-specific UI checks and layout diagnostics were removed from pr
 - Broaden in-page DM Reel checks beyond the one observed layout/account: long playback, repeated swipes, rotation, source changes, other languages, private posts and carousels. Improve the cropped player layout. Fixture tests and one successful live flow do not establish universal compatibility.
 - Test 2FA/challenges, logout, slow/offline networks, uploads, different languages, VoiceOver traversal, iPad and a physical iPhone. The automatic accessibility audit covers native pause-screen controls, not the full Instagram website.
 - Validate sponsored-card hiding across live layouts and languages. Story ads and unfamiliar advertising surfaces are not guaranteed to be removed.
-- Upgrade from Personal Team development signing to paid-program distribution, validate a signed distribution archive, distribute through TestFlight, and complete App Store review requirements, final naming, service authorization, public source/support/privacy URLs and listing disclosures.
+- Complete TestFlight beta review and actual recipient installation, plus public App Store requirements including service authorization, naming checks, age/privacy/trader disclosures and permitted review content. Paid-team export, signature validation, source/support/privacy pages and upload were completed on November 2; these do not imply review approval.
 
-The latest local archive is `build/Quietly-notifications.xcarchive`; it is unsigned and is not an App Store upload. The simulator build is `build/DerivedData/Build/Products/Debug-iphonesimulator/Quietly.app`. See [the installation guide](app-store-release.md#install-on-your-own-iphone-first) for the prepared physical-device steps.
+The current TestFlight source archive is `build/testflight/Quietly-0.2.0-3.xcarchive`; its signed App Store export is `build/testflight/export/Quietly.ipa`, uploaded successfully on November 2. The older `build/Quietly-notifications.xcarchive` remains an unsigned historical artifact. The simulator build is `build/DerivedData/Build/Products/Debug-iphonesimulator/Quietly.app`. See [the installation guide](app-store-release.md#install-on-your-own-iphone-first) for the prepared physical-device steps.
