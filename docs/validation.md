@@ -8,7 +8,7 @@
 - App Store export succeeded using the paid developer team. Strict signature verification passed with an Apple Distribution certificate, a Store provisioning profile, `get-task-allow=false` and `beta-reports-active=true`. No device list is embedded. The bundled scripts, license and privacy manifest were verified.
 - Xcode confirmed **upload succeeded**; Apple finished processing version **0.2.0 (3)**. The owner-only internal testing group has one build and one tester, with invitation status confirmed as **Invited**. The TestFlight screen reports 90 days remaining. Actual TestFlight installation and external beta review remain outstanding. Upload logs and distribution artifacts stay under ignored `build/testflight/`. Internal availability is not public App Store approval.
 - [Privacy](privacy.md) and [support](support.md) documents now include publisher contact details, Instagram data handling and TestFlight diagnostic disclosures.
-- External beta review still needs a dedicated Instagram review account entered privately in App Store Connect. Never commit review credentials or share personal account sessions. Broader physical-device, account/layout and service-authorization limitations below remain applicable.
+- With the account holder’s explicit authorization, the review login was verified and saved only in App Store Connect. Version 0.2.0 (3) was submitted to the Friends beta external group; Apple confirms **Waiting for Review**. The public invitation link is prepared, but Apple states testers cannot join until the group has an approved build. No review credentials or account content are included in source control. Broader physical-device, account/layout and service-authorization limitations below remain applicable.
 
 ## 0.2.0 sideloading beta
 
