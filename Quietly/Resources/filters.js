@@ -21,6 +21,7 @@
   const unknownPosts = new WeakMap();
   let stopped = false;
   let followingRequested = false;
+  let signInRequested = false;
   const handedOffViewers = new WeakSet();
   let inlineViewer = null;
   let touchStart = null;
@@ -42,6 +43,30 @@
   function hrefURL(link) {
     try { return new URL(link.getAttribute("href"), location.href); } catch (_) { return null; }
   }
+  function welcomeLoginControl() {
+    if (!["/", "/accounts/login/"].includes(location.pathname) ||
+        document.querySelector('input[type="password"], input[autocomplete="current-password"]')) return null;
+    if ([...document.querySelectorAll("main article, [role=main] article")].some(isFeedPost)) return null;
+    const visible = node => node.getClientRects().length > 0 && getComputedStyle(node).visibility !== "hidden";
+    const controls = [...document.querySelectorAll("a[href],button,[role=button],span")].filter(visible);
+    const label = node => (node.getAttribute("aria-label") || node.textContent).trim().toLowerCase();
+    const appLabels = new Set(["open instagram", "abrir instagram", "instagram megnyitása", "deschide instagram"]);
+    const loginLabels = new Set(["log in", "iniciar sesión", "entrar", "bejelentkezés", "autentificare"]);
+    if (controls.some(node => appLabels.has(label(node)))) {
+      const login = controls.find(node => loginLabels.has(label(node)));
+      if (login) return login.closest("a,button,[role=button]") || login;
+    }
+    const links = [...document.querySelectorAll("a[href]")].filter(link => {
+      const url = hrefURL(link);
+      return url && url.origin === location.origin && visible(link);
+    });
+    if (!links.some(link => hrefURL(link).pathname === "/accounts/emailsignup/")) return null;
+    return links.find(link => hrefURL(link).pathname === "/accounts/login/") || null;
+  }
+  // Instagram may open its login form with an in-page click handler even when
+  // the URL already says /accounts/login/. Follow that visible control rather
+  // than guessing another endpoint or repeatedly reloading the same welcome page.
+  window.__quietlyOpenWebSignIn = () => { welcomeLoginControl()?.click(); };
   function postID(url) {
     if (!url || url.protocol !== "https:" || !["instagram.com", "www.instagram.com"].includes(url.hostname)) return null;
     const match = url.pathname.match(/^\/(?:[a-zA-Z0-9._]+\/)?(?:p|reel|reels)\/([A-Za-z0-9_-]{1,64})\/?$/);
@@ -271,6 +296,10 @@
     if (lastReport !== (blockedReason || "clear")) {
       lastReport = blockedReason || "clear";
       report({ type: "route", reason: blockedReason || "" });
+    }
+    if (!signInRequested && welcomeLoginControl()) {
+      signInRequested = true;
+      report({ type: "signInRequired" });
     }
 
     // Individual posts from DMs/friends open in a separate, bounded viewer.

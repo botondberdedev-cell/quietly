@@ -76,6 +76,21 @@ final class WebKitIntegrationTests: XCTestCase {
         XCTAssertNil(browser.inboxUnreadCount)
     }
 
+    func testMobileWelcomeOpensItsExistingWebFormThroughTheIsolatedBridge() async throws {
+        let browser = browser()
+        defer { browser.stop() }
+        try await load("""
+        <main id="welcome"><button>Abrir Instagram</button>
+        <button onclick="document.querySelector('#welcome').innerHTML='<form><input type=password><button>Iniciar sesión</button></form>'">Iniciar sesión</button>
+        <button>Registrarte</button></main>
+        """, path: "/accounts/login/", into: browser)
+        try await eventually {
+            (try? await browser.webView.evaluateJavaScript("document.querySelector('input[type=password]') !== null")) as? Bool == true
+        }
+        XCTAssertNil(browser.externalURL)
+        XCTAssertNil(browser.boundary)
+    }
+
     func testBundledFilterRunsInIsolatedWorldAndPreservesFriendAuthor() async throws {
         let browser = browser()
         defer { browser.stop() }

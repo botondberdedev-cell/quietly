@@ -1,11 +1,10 @@
 # Quietly
 
-A free, MIT-licensed iPhone and iPad app for intentional Instagram visits. No subscription, app account, analytics SDK, or backend. **Quietly is a working name; this is a prototype, not a release-ready App Store build.**
+A free, MIT-licensed iPhone and iPad app for intentional Instagram visits. No subscription, app account, analytics SDK, or backend. Published in TestFlight as **Quietly: Friends & Focus**. This is an early beta, not a stable public App Store release.
 
-**Install the early beta:** [SideStore / AltStore Classic instructions](docs/sideloading.md).
-The installer signs the app with your own Apple Account. Free accounts need a
-refresh within seven days. See [release notes](docs/releases/0.2.0.md) and
-[GitHub Releases](https://github.com/botondberdedev-cell/quietly/releases).
+**Install the free iPhone/iPad beta:** [Join through TestFlight](https://testflight.apple.com/join/a2EyuZq8). Install Apple's TestFlight app first, then accept the invitation. Updates arrive through the same invitation and TestFlight app when available. Requires iOS/iPadOS 17 or later.
+
+For self-signed installation, see [SideStore / AltStore Classic instructions](docs/sideloading.md). Free Apple accounts need a refresh within seven days on that route. See [sideload release notes](docs/releases/0.2.0.md) and [GitHub Releases](https://github.com/botondberdedev-cell/quietly/releases).
 
 ## What it does
 
@@ -77,7 +76,7 @@ See [validation status](docs/validation.md) for checks actually executed and env
 - The finite post budget survives in-page navigation and DOM recycling, but a full page reload or a new page visit resets it. It is a voluntary boundary, not a tamper-proof restriction.
 - **No background DM alerts:** unread detection runs only while Quietly is open in an active visit. It recognizes supported English/Spanish inbox navigation badges, not every message event; Instagram can change the layout. Initial unread messages establish a silent baseline, and bursts are throttled. Local alerts are not a remote push service. Keep Instagram's own DM notifications enabled for messages while away.
 - No system-wide app shielding, Screen Time entitlement, remote push notifications, native calls, media downloads, or other social platforms are implemented.
-- Instagram's web login, 2FA, challenges, uploads, accessibility and non-English layouts require device testing. Facebook cross-site login is not validated; a Safari login does not automatically share cookies with the embedded browser.
+- Instagram's web login, 2FA, challenges, uploads, accessibility and non-English layouts require device testing. Supported Facebook authentication routes stay in the same embedded browser when opened from Instagram’s sign-in screen. Full Facebook account linking and challenges still need a real-account device test. The Account menu can reopen Instagram’s web sign-in form or request its desktop login layout to expose additional sign-in options. The mobile app-promotion screen’s existing web-login control is followed automatically when recognized. Ordinary external links still open separately.
 - Following relies on Instagram to provide followed-account content. The app redirects ordinary home timelines to Following in that mode; it does not retrieve the account's social graph through private APIs. No claim is made to remove every possible suggested or sponsored surface.
 - Public source: [botondberdedev-cell/quietly](https://github.com/botondberdedev-cell/quietly). There is no App Store listing yet. The public code is an experimental prototype, not a signed distribution build.
 

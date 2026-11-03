@@ -131,7 +131,7 @@ struct SettingsView: View {
         List {
             Section("How browsing works") {
                 Text("Quietly loads instagram.com in Apple’s embedded WebKit browser. You sign in on Instagram’s page. The app applies bundled filters to page elements and navigation; it does not modify the installed Instagram app.")
-                Text("Messages, stories, profiles, posting and authentication depend on what Instagram supports on its mobile website. Optional message alerts detect increases in its unread indicator only while Quietly is open. Background message delivery and native calls are not provided. Facebook login may need a separate browser and is not validated in this prototype.")
+                Text("Messages, stories, profiles, posting and authentication depend on what Instagram supports on its mobile website. Optional message alerts detect increases in its unread indicator only while Quietly is open. Background message delivery and native calls are not provided. Facebook sign-in stays inside Quietly on supported Meta authentication pages. Account linking and security checks depend on Meta; the complete Facebook sign-in flow is not yet verified.")
             }
             Section("Stored on your device") {
                 Text("Your filter preferences, Friends list, current visit deadline and completed visit count are saved locally. WebKit stores Instagram cookies and website data to keep you signed in. You can clear them in Settings.")

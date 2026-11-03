@@ -33,6 +33,13 @@ struct SessionView: View {
                 Label(timeRemaining, systemImage: "hourglass")
                     .font(.subheadline.monospacedDigit()).foregroundStyle(Palette.secondaryText)
                     .accessibilityLabel("\(session.remaining(at: now)) seconds remaining")
+                Menu {
+                    Button("Sign in to Instagram here") { browser.signIn() }
+                    Button("More login options (desktop page)") { browser.signIn(useDesktopSite: true) }
+                } label: {
+                    Label("Account", systemImage: "person.crop.circle")
+                        .labelStyle(.iconOnly).frame(width: 44, height: 44).contentShape(Rectangle())
+                }.accessibilityIdentifier("account.menu")
                 Button(action: onSettings) {
                     Label("Settings", systemImage: "slider.horizontal.3")
                         .labelStyle(.iconOnly).frame(width: 44, height: 44).contentShape(Rectangle())
@@ -44,6 +51,11 @@ struct SessionView: View {
                 }
                     .accessibilityIdentifier("session.end")
             }.buttonStyle(.plain).padding(.horizontal).padding(.vertical, 4)
+            if browser.isSigningIn {
+                Text("Sign in here to use Instagram in Quietly.")
+                    .font(.footnote).foregroundStyle(Palette.secondaryText)
+                    .frame(maxWidth: .infinity).padding(.horizontal).padding(.bottom, 8)
+            }
             if browser.inlinePostIsActive && !session.hasEnded(at: now) {
                 HStack {
                     Text("One shared Reel").font(.subheadline)

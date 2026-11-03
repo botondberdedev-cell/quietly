@@ -45,7 +45,9 @@ struct RootView: View {
                 feature("lock", "Free and open source", "No Quietly account, subscriptions or analytics. Your settings stay on your device.")
                 Text("Your home opens Instagram’s Following feed. No separate friends list needed. Instagram’s own privacy policy applies, and filters work inside Quietly.")
                     .font(.footnote).foregroundStyle(Palette.secondaryText)
-                PrimaryButton(title: "Open Instagram") {
+                Text("Sign in on Instagram’s website inside Quietly. You don’t need to open the Instagram app.")
+                    .font(.footnote).foregroundStyle(Palette.secondaryText)
+                PrimaryButton(title: "Continue in Quietly") {
                     store.hasOnboarded = true
                     store.start(.home)
                 }
@@ -67,7 +69,7 @@ struct RootView: View {
                     Text("Your visit has ended. Your people will still be here when you want to return.")
                         .font(.title3).foregroundStyle(Palette.secondaryText)
                         .fixedSize(horizontal: false, vertical: true)
-                    PrimaryButton(title: "Open Instagram", icon: "house") { store.start(.home) }
+                    PrimaryButton(title: "Continue in Quietly", icon: "house") { store.start(.home) }
                     NavigationLink { FriendsView() } label: {
                         Label("Your people", systemImage: "person.2")
                             .frame(maxWidth: .infinity, minHeight: 44)

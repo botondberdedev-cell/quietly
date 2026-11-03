@@ -17,6 +17,7 @@ final class InstagramBrowser: NSObject, ObservableObject, WKNavigationDelegate, 
     @Published var postState = "loading" { didSet { updateMediaSuspension() } }
     @Published var inlinePostIsActive = false
     @Published private(set) var inboxUnreadCount: Int?
+    @Published private(set) var isSigningIn = false
     let webView: WKWebView
     private let settings: FocusSettings
     private let deadline: Date
@@ -29,6 +30,9 @@ final class InstagramBrowser: NSObject, ObservableObject, WKNavigationDelegate, 
     private var sceneIsActive = true
     private var externalPageIsPresented = false
     private var mediaIsSuspended = false
+    private var facebookSignInIsActive = false
+    private var desktopSignInIsActive = false
+    private var automaticSignInAttempts = 0
 
     var shouldSuspendMedia: Bool {
         !sceneIsActive || externalPageIsPresented || hasStopped || Date() >= deadline
@@ -102,7 +106,6 @@ final class InstagramBrowser: NSObject, ObservableObject, WKNavigationDelegate, 
         webView.navigationDelegate = self
         webView.uiDelegate = self
         webView.allowsBackForwardNavigationGestures = true
-        // Changing hosts never silently opens another installed app.
         observations = [
             webView.observe(\.isLoading, options: [.new]) { [weak self] view, _ in
                 Task { @MainActor in self?.isLoading = view.isLoading }
@@ -133,6 +136,18 @@ final class InstagramBrowser: NSObject, ObservableObject, WKNavigationDelegate, 
         failure = nil
         inlinePostIsActive = false
         webView.load(URLRequest(url: destination.url(settings: settings)))
+    }
+
+    func signIn(useDesktopSite: Bool = false) {
+        guard singlePost == nil, resourcesReady, !hasStopped, Date() < deadline else { return }
+        boundary = nil
+        failure = nil
+        externalURL = nil
+        inlinePostIsActive = false
+        facebookSignInIsActive = false
+        desktopSignInIsActive = useDesktopSite
+        automaticSignInAttempts = 0
+        webView.load(URLRequest(url: NavigationPolicy.signInURL))
     }
 
     func closeInlinePost() {
@@ -176,13 +191,28 @@ final class InstagramBrowser: NSObject, ObservableObject, WKNavigationDelegate, 
     }
 
     private func checkCurrentRoute(_ url: URL?) {
+        isSigningIn = url.map { NavigationPolicy.isInstagramSignIn($0) || NavigationPolicy.isFacebookSignIn($0) } ?? false
         guard let url, NavigationPolicy.isInstagram(url) else { return }
+        facebookSignInIsActive = false
         if !url.path.hasPrefix("/direct/") && FriendAccount.username(on: url) == nil { inlinePostIsActive = false }
         switch NavigationPolicy.decision(for: url, settings: settings, singlePost: singlePost) {
         case .blocked(let message): boundary = message
         case .allow: boundary = nil
         default: break
         }
+    }
+
+    func webView(_ webView: WKWebView, decidePolicyFor action: WKNavigationAction,
+                 preferences: WKWebpagePreferences,
+                 decisionHandler: @escaping (WKNavigationActionPolicy, WKWebpagePreferences) -> Void) {
+        let authenticationPage = action.request.url.map {
+            NavigationPolicy.isInstagramSignIn($0) || NavigationPolicy.isFacebookSignIn($0)
+                || (NavigationPolicy.isInstagram($0) && $0.path.hasPrefix("/challenge/"))
+        } ?? false
+        // Public WebKit “Request Desktop Website” mode is scoped to login.
+        // Instagram's feed, Stories and messages keep their mobile layout.
+        preferences.preferredContentMode = desktopSignInIsActive && authenticationPage ? .desktop : .mobile
+        self.webView(webView, decidePolicyFor: action) { decisionHandler($0, preferences) }
     }
 
     func webView(_ webView: WKWebView, decidePolicyFor action: WKNavigationAction,
@@ -196,6 +226,22 @@ final class InstagramBrowser: NSObject, ObservableObject, WKNavigationDelegate, 
             decisionHandler(url.scheme == "https" || url.absoluteString == "about:blank" ? .allow : .cancel)
             return
         }
+        if singlePost == nil, NavigationPolicy.allowsFacebookSignIn(url, from: webView.url,
+                                                                   continuing: facebookSignInIsActive) {
+            facebookSignInIsActive = true
+            if action.navigationType == .linkActivated || action.targetFrame == nil {
+                decisionHandler(.cancel)
+                webView.load(action.request)
+            } else { decisionHandler(.allow) }
+            return
+        }
+        // Instagram's mobile interstitial can offer an instagram:// app button.
+        // During sign-in, take the user to the web form instead of a dead tap.
+        if singlePost == nil, url.scheme?.lowercased() == "instagram", isSigningIn {
+            decisionHandler(.cancel)
+            signIn()
+            return
+        }
         if singlePost == nil, action.navigationType == .linkActivated,
            let source = webView.url, NavigationPolicy.isFriendContext(source, settings: settings),
            let post = InstagramPost(url: url) {
@@ -205,7 +251,13 @@ final class InstagramBrowser: NSObject, ObservableObject, WKNavigationDelegate, 
         }
         switch NavigationPolicy.decision(for: url, settings: settings, singlePost: singlePost) {
         case .allow:
-            decisionHandler(.allow)
+            // Reissue tapped links as in-web-view requests so WebKit does not
+            // hand Universal Links to the installed Instagram app. Form posts
+            // and redirects continue normally; no private WebKit API is used.
+            if action.navigationType == .linkActivated || action.targetFrame == nil {
+                decisionHandler(.cancel)
+                webView.load(action.request)
+            } else { decisionHandler(.allow) }
         case .blocked(let message):
             boundary = message
             decisionHandler(.cancel)
@@ -220,6 +272,12 @@ final class InstagramBrowser: NSObject, ObservableObject, WKNavigationDelegate, 
     func webView(_ webView: WKWebView, createWebViewWith configuration: WKWebViewConfiguration,
                  for action: WKNavigationAction, windowFeatures: WKWindowFeatures) -> WKWebView? {
         guard !hasStopped, Date() < deadline, let url = action.request.url else { return nil }
+        if singlePost == nil, NavigationPolicy.allowsFacebookSignIn(url, from: webView.url,
+                                                                   continuing: facebookSignInIsActive) {
+            facebookSignInIsActive = true
+            webView.load(action.request)
+            return nil
+        }
         if singlePost == nil, let source = webView.url, NavigationPolicy.isFriendContext(source, settings: settings),
            let post = InstagramPost(url: url) {
             selectedPost = post
@@ -267,6 +325,13 @@ final class InstagramBrowser: NSObject, ObservableObject, WKNavigationDelegate, 
             if body["type"] == "postState", let state = body["state"], ["ready", "loading", "unavailable"].contains(state) {
                 postState = state
             }
+            return
+        }
+        if body["type"] == "signInRequired", let current = webView.url,
+           NavigationPolicy.isInstagram(current), ["/", "/accounts/login"].contains(current.path),
+           origin.path == current.path, automaticSignInAttempts < 2 {
+            automaticSignInAttempts += 1
+            webView.evaluateJavaScript("window.__quietlyOpenWebSignIn?.()", in: nil, in: filterWorld, completionHandler: nil)
             return
         }
         if body["type"] == "inboxCount" {

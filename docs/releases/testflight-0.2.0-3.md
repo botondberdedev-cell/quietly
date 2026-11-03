@@ -1,6 +1,6 @@
 # Quietly: Friends & Focus — TestFlight 0.2.0 (3)
 
-Uploaded and processed November 2, 2026. The owner-only internal testing invitation is active. External beta review was submitted on November 2 and App Store Connect confirms **Waiting for Review** for the Friends beta group. The [public TestFlight invitation](https://testflight.apple.com/join/a2EyuZq8) has been created, but testers cannot join until Apple approves a build for this group. This build is an early beta, not a public App Store release.
+Uploaded and processed November 2, 2026. External beta review was submitted that day. The [public TestFlight invitation](https://testflight.apple.com/join/a2EyuZq8) was confirmed live on November 3, with the installation option available. This build is an early beta, not a public App Store release.
 
 ## What to test
 

@@ -38,6 +38,27 @@ final class QuietlyCoreTests: XCTestCase {
         }
     }
 
+    func testFacebookSignInIsLimitedToTrustedAuthenticationRoutesAndContext() {
+        let login = NavigationPolicy.signInURL
+        let facebook = URL(string: "https://www.facebook.com/login.php?next=oidc")!
+        for path in ["/login.php", "/login/", "/oidc/", "/checkpoint/123", "/two_step_verification/"] {
+            let url = URL(string: "https://www.facebook.com" + path)!
+            XCTAssertTrue(NavigationPolicy.allowsFacebookSignIn(url, from: login, continuing: false))
+            XCTAssertTrue(NavigationPolicy.allowsFacebookSignIn(url, from: facebook, continuing: true))
+            XCTAssertFalse(NavigationPolicy.allowsFacebookSignIn(url, from: facebook, continuing: false))
+            XCTAssertFalse(NavigationPolicy.allowsFacebookSignIn(url, from: URL(string: "https://www.instagram.com/direct/inbox/"), continuing: true))
+            // General browsing and single-post policy never whitelist Facebook.
+            XCTAssertEqual(decision(url.absoluteString), .external)
+            XCTAssertEqual(NavigationPolicy.decision(for: url, settings: settings, singlePost: InstagramPost(id: "Shared1")), .blocked("One post at a time"))
+        }
+        for value in ["https://www.facebook.com/", "https://www.facebook.com/reels/", "https://www.facebook.com/watch/", "https://www.facebook.com/l.php?u=example", "https://facebook.com.evil.example/login.php", "https://user@www.facebook.com/login.php", "https://www.facebook.com:444/login.php", "http://www.facebook.com/login.php", "fb://login", "https://www.facebook.com/login-lookalike/"] {
+            XCTAssertFalse(NavigationPolicy.allowsFacebookSignIn(URL(string: value)!, from: login, continuing: true), value)
+        }
+        XCTAssertFalse(NavigationPolicy.allowsFacebookSignIn(facebook, from: nil, continuing: true))
+        XCTAssertFalse(NavigationPolicy.allowsFacebookSignIn(facebook, from: URL(string: "https://evil.example/accounts/login/"), continuing: true))
+        XCTAssertTrue(NavigationPolicy.allowsFacebookSignIn(facebook, from: URL(string: "https://www.instagram.com/"), continuing: false))
+    }
+
     func testBudgetHasExactBoundaryAndSurvivesCoding() throws {
         let start = Date(timeIntervalSince1970: 1000)
         let session = FocusSession(minutes: 5, destination: .messages, now: start)

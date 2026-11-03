@@ -10,4 +10,6 @@ Message alerts only detect supported unread-indicator changes while Quietly is o
 
 To sign out of the web session, use Settings → Clear Instagram login & website data. This does not delete your Instagram account.
 
+In the build 4 login update, **Continue in Quietly** opens Instagram’s website inside the app. If Instagram displays an app-opening prompt, use the person icon (**Account**) → **Sign in to Instagram here** to return to the web form. If Facebook is missing from the phone layout, try **Account → More login options (desktop page)**. This requests Instagram’s desktop sign-in page inside Quietly, but Facebook may still be absent for some accounts or layouts. Supported Facebook authentication pages stay in the same browser; complete Facebook sign-in and account linking still need a real-account test. Build 4 has been uploaded to Apple and is awaiting the remaining TestFlight distribution steps; availability to friends is not yet confirmed.
+
 Read the [privacy policy](privacy.md) and [source code](https://github.com/botondberdedev-cell/quietly). Quietly is independent of Instagram and Meta.

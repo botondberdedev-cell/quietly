@@ -23,7 +23,7 @@ final class QuietlyUITests: XCTestCase {
     }
 
     private func onboard() {
-        let start = app.buttons["Open Instagram"]
+        let start = app.buttons["Continue in Quietly"]
         reveal(start)
         start.tap()
         XCTAssertTrue(app.buttons["session.end"].waitForExistence(timeout: 5))
@@ -31,7 +31,7 @@ final class QuietlyUITests: XCTestCase {
 
     private func endVisit() {
         app.buttons["session.end"].tap()
-        XCTAssertTrue(app.buttons["Open Instagram"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["Continue in Quietly"].waitForExistence(timeout: 5))
     }
 
     private func screenshot(_ name: String) {
@@ -51,7 +51,33 @@ final class QuietlyUITests: XCTestCase {
         app.launchArguments = ["-quietly-ui-testing"]
         app.launch()
         XCTAssertTrue(app.buttons["session.end"].waitForExistence(timeout: 5))
-        XCTAssertFalse(app.buttons["Open Instagram"].exists)
+        XCTAssertFalse(app.buttons["Continue in Quietly"].exists)
+    }
+
+    func testAccountMenuOffersSignInInsideQuietly() {
+        onboard()
+        app.buttons["account.menu"].tap()
+        let signIn = app.buttons["Sign in to Instagram here"]
+        XCTAssertTrue(signIn.waitForExistence(timeout: 5))
+        signIn.tap()
+        XCTAssertTrue(app.webViews.firstMatch.exists)
+        XCTAssertTrue(app.buttons["session.end"].exists)
+        XCTAssertTrue(app.staticTexts["Sign in here to use Instagram in Quietly."].waitForExistence(timeout: 15))
+        screenshot("Sign in inside Quietly")
+    }
+
+    func testMoreLoginOptionsStaysInsideQuietly() {
+        onboard()
+        app.buttons["account.menu"].tap()
+        let desktopLogin = app.buttons["More login options (desktop page)"]
+        XCTAssertTrue(desktopLogin.waitForExistence(timeout: 5))
+        desktopLogin.tap()
+        XCTAssertTrue(app.webViews.firstMatch.exists)
+        XCTAssertTrue(app.buttons["session.end"].exists)
+        XCTAssertTrue(app.staticTexts["Sign in here to use Instagram in Quietly."].waitForExistence(timeout: 15))
+        let formAppeared = app.secureTextFields.firstMatch.waitForExistence(timeout: 30)
+        screenshot("More login options inside Quietly")
+        XCTAssertTrue(formAppeared, "The actual web password form must appear, not just Instagram's app-promotion screen")
     }
 
     func testOnboardingFriendValidationPersistenceAndRemoval() {
@@ -105,7 +131,7 @@ final class QuietlyUITests: XCTestCase {
         XCTAssertTrue(app.buttons["Back to my day"].waitForExistence(timeout: 10))
         screenshot("Visit complete")
         app.buttons["Back to my day"].tap()
-        XCTAssertTrue(app.buttons["Open Instagram"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["Continue in Quietly"].waitForExistence(timeout: 5))
         reveal(app.staticTexts["1 visit brought to a close."])
     }
 
@@ -159,7 +185,7 @@ final class QuietlyUITests: XCTestCase {
         endVisit()
         screenshot("Accessibility text pause screen")
         XCUIDevice.shared.orientation = .landscapeLeft
-        reveal(app.buttons["Open Instagram"])
+        reveal(app.buttons["Continue in Quietly"])
         screenshot("Landscape pause screen")
         app.buttons["settings.open"].tap()
         XCTAssertTrue(app.buttons["settings.done"].waitForExistence(timeout: 5))

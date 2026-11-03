@@ -6,6 +6,29 @@ enum NavigationDecision: Equatable {
 }
 
 enum NavigationPolicy {
+    static let signInURL = URL(string: "https://www.instagram.com/accounts/login/")!
+
+    static func isInstagramSignIn(_ url: URL) -> Bool {
+        isInstagram(url) && (url.path.hasPrefix("/accounts/login") || url.path.hasPrefix("/accounts/signupviafb"))
+    }
+
+    static func isFacebookSignIn(_ url: URL) -> Bool {
+        guard url.scheme?.lowercased() == "https", url.user == nil, url.password == nil,
+              url.port == nil || url.port == 443,
+              ["facebook.com", "www.facebook.com", "m.facebook.com"].contains(url.host?.lowercased() ?? "") else { return false }
+        let parts = url.path.split(separator: "/").map(String.init)
+        // Login, Instagram's OIDC hand-off, and authentication challenges only.
+        // Facebook's home, Watch, Reels and arbitrary redirect endpoints stay external.
+        return ["login.php", "login", "oidc", "checkpoint", "two_step_verification"].contains(parts.first ?? "")
+    }
+
+    static func allowsFacebookSignIn(_ url: URL, from source: URL?, continuing: Bool) -> Bool {
+        guard isFacebookSignIn(url), let source else { return false }
+        if continuing && isFacebookSignIn(source) { return true }
+        // Instagram can render its logged-out sign-in screen at the root too.
+        return isInstagramSignIn(source) || (isInstagram(source) && ["", "/"].contains(source.path))
+    }
+
     static func isInstagram(_ url: URL) -> Bool {
         guard url.scheme?.lowercased() == "https", url.user == nil, url.password == nil,
               url.port == nil || url.port == 443 else { return false }

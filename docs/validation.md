@@ -1,4 +1,16 @@
-# Validation — November 2, 2026
+# Validation — November 3, 2026
+
+## 0.2.0 (4) login update — November 3, 2026
+
+- Renamed the entry button to **Continue in Quietly**. The Account menu offers a direct web sign-in action and **More login options (desktop page)**. Desktop content mode applies only to authentication pages; normal Instagram content uses the mobile layout.
+- The mobile welcome page may show “Open Instagram” even at `/accounts/login/`. The isolated filter recognizes its visible sign-in control and follows that control, with a native two-attempt limit to prevent loops. Credential values are never read. A strengthened UI test caught an incorrect trailing-slash comparison in the native handler; normalizing that check lets the actual password form appear.
+- Tapped Instagram web links are reissued inside the same WKWebView to avoid a Universal Link app hand-off. Ordinary form submissions and redirects retain normal WebKit handling. No private APIs, user-agent spoofing or credential interception are used.
+- Supported Facebook login/OIDC/challenge routes stay in the same website-data store when initiated from Instagram’s login screen. Other Facebook pages and lookalike origins remain external. Single-post mode cannot start this flow.
+- A live iPhone 17 simulator UI test reached Instagram’s actual password form and visibly showed **Iniciar sesión con Facebook** inside Quietly. Result bundle: `test-results/login-normalized-20261103.xcresult`; screenshot under ignored `build/login-working/`. This verifies that the login option renders, not that account authentication completes.
+- **113 final checks passed:** 17 Swift core, 37 Chromium, 37 WebKit, 19 native app-host and 3 focused native UI checks. After removing diagnostic code, the real password-form check, ordinary account action and visit restoration passed in `test-results/login-release-ready-20261103.xcresult`. The Release build also compiled successfully with Swift warnings treated as errors. The remaining UI suite was not repeated for this update.
+- Temporary, logged-out page-layout diagnostics were removed from app and test sources. No passwords, private messages or account content were entered or published.
+- Remaining checks: complete Facebook sign-in/account linking/2FA and return to the Following feed; verify app-opening behavior on a physical iPhone with Instagram installed. Simulator tests cannot prove the native-app hand-off behavior on that device.
+- The signed App Store export passed strict signature verification, with the expected bundle ID, version/build, distribution profile and bundled resources. Xcode confirmed **upload succeeded** and **uploaded package is processing** on November 3. Assignment to the external testing group and any required beta review remain pending. The existing public invitation is live for the earlier beta; build 4 is not yet confirmed available to external testers.
 
 ## 0.2.0 (3) TestFlight upload — November 2, 2026
 
@@ -55,4 +67,4 @@ Temporary account-specific UI checks and layout diagnostics were removed from pr
 - Validate sponsored-card hiding across live layouts and languages. Story ads and unfamiliar advertising surfaces are not guaranteed to be removed.
 - Complete TestFlight beta review and actual recipient installation, plus public App Store requirements including service authorization, naming checks, age/privacy/trader disclosures and permitted review content. Paid-team export, signature validation, source/support/privacy pages and upload were completed on November 2; these do not imply review approval.
 
-The current TestFlight source archive is `build/testflight/Quietly-0.2.0-3.xcarchive`; its signed App Store export is `build/testflight/export/Quietly.ipa`, uploaded successfully on November 2. The older `build/Quietly-notifications.xcarchive` remains an unsigned historical artifact. The simulator build is `build/DerivedData/Build/Products/Debug-iphonesimulator/Quietly.app`. See [the installation guide](app-store-release.md#install-on-your-own-iphone-first) for the prepared physical-device steps.
+The current TestFlight source archive is `build/testflight/Quietly-0.2.0-4.xcarchive`; its signed App Store export is `build/testflight/export-0.2.0-4/Quietly.ipa`, uploaded successfully on November 3. The older `build/Quietly-notifications.xcarchive` remains an unsigned historical artifact. The simulator build is `build/DerivedData/Build/Products/Debug-iphonesimulator/Quietly.app`. See [the installation guide](app-store-release.md#install-on-your-own-iphone-first) for the prepared physical-device steps.

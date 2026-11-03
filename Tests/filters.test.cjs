@@ -314,6 +314,31 @@ test("single-post media guard pauses other videos and stops the selected video a
   assert.deepEqual(result, { before: [false, true], after: true });
 });
 
+test("mobile welcome requests web sign-in once without touching forms or feed posts", async t => {
+  const choices = '<a href="/accounts/login/">Entrar</a><a href="/accounts/emailsignup/">Registrarse</a>';
+  const page = await fixture(t, { options: { feedMode: "following" }, html: `<main>${choices}<a href="instagram://app">Abrir Instagram</a></main>` });
+  await page.waitForFunction(() => window.reports.some(r => r.type === "signInRequired"));
+  await page.locator("main").evaluate(el => el.append(document.createElement("div")));
+  assert.equal(await page.evaluate(() => window.reports.filter(r => r.type === "signInRequired").length), 1);
+  for (const html of [`<main><input type="password">${choices}</main>`, `<main>${article(1)}${choices}</main>`]) {
+    const other = await fixture(t, { pathname: '/?variant=following', options: { feedMode: 'following' }, html });
+    assert.equal(await other.evaluate(() => window.reports.some(r => r.type === "signInRequired")), false);
+  }
+});
+
+test("mobile app-promotion buttons open the in-page web form without a login anchor", async t => {
+  const page = await fixture(t, { pathname: '/accounts/login/', html: '<main><button>Abrir Instagram</button><span role="button" id="web-login">Iniciar sesión</span><span role="button">Registrarte</span></main>' });
+  await page.waitForFunction(() => window.reports.some(r => r.type === 'signInRequired'));
+  await page.evaluate(() => {
+    document.querySelector('#web-login').onclick = () => {
+      document.querySelector('main').innerHTML = '<form><input type="password"><button>Iniciar sesión</button></form>';
+    };
+    window.__quietlyOpenWebSignIn();
+  });
+  assert.equal(await page.locator('input[type=password]').isVisible(), true);
+  assert.equal(await page.evaluate(() => window.reports.filter(r => r.type === 'signInRequired').length), 1);
+});
+
 test("login, profile and inbox articles are not mistaken for home posts", async t => {
   for (const pathname of ["/accounts/login/", "/friend/", "/direct/inbox/"]) {
     const page = await fixture(t, { pathname, html: `<main>${article(1)}</main>` });
