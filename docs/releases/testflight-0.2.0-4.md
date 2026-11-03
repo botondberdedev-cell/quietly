@@ -1,6 +1,6 @@
 # Quietly: Friends & Focus — TestFlight 0.2.0 (4)
 
-Uploaded successfully to App Store Connect on November 3, 2026. Xcode confirmed that the uploaded package is processing. Assignment to the external testing group and any required beta review remain pending; build 4 is not yet confirmed available to friends. The existing [friends' invitation](https://testflight.apple.com/join/a2EyuZq8) remains the same and continues to offer the earlier beta.
+Published to TestFlight on November 3, 2026. Apple approved build 4 after submission, and App Store Connect now shows **Testing** with both **Friends beta** and **Owner testing** assigned. The existing [friends' invitation](https://testflight.apple.com/join/a2EyuZq8) remains active. Existing testers can update through TestFlight; new testers can use the same invitation. This is a TestFlight beta, not a public App Store release.
 
 ## Changes
 
